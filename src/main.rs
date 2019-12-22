@@ -1,4 +1,7 @@
+use std::fs;
+use std::io;
 use std::path::PathBuf;
+
 use structopt::StructOpt;
 
 use aoc2019;
@@ -14,5 +17,14 @@ struct Opt {
 
 fn main() {
     let opt = Opt::from_args();
-    aoc2019::day01::run();
+
+    match opt.input {
+        Some(path) => {
+            let file = fs::File::open(path).unwrap();
+            let reader = io::BufReader::new(file);
+            let answer = aoc2019::day01::run(reader);
+            println!("{}", answer);
+        },
+        None => unimplemented!(),
+    }
 }
