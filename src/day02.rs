@@ -15,7 +15,7 @@ impl Computer {
         rom_reader.read_to_string(&mut buffer)?;
         let rom = buffer
             .trim()
-            .split(",")
+            .split(',')
             .map(|s| Ok(s.parse::<usize>()?))
             .collect::<Result<Vec<_>, Error>>()?;
 
@@ -66,7 +66,7 @@ where
     ));
     for noun in 0..=99 {
         for verb in 0..=99 {
-            if computer.execute(noun, verb)? == 19690720 {
+            if computer.execute(noun, verb)? == 19_690_720 {
                 answer2 = Ok(100 * noun + verb);
             }
         }
@@ -100,7 +100,7 @@ mod tests {
             let mut computer = Computer::new(reader).unwrap();
             let _ = computer.execute(*noun, *verb).unwrap();
             let expected_ram = expected_ram
-                .split(",")
+                .split(',')
                 .map(|s| s.trim().parse::<usize>().unwrap())
                 .collect::<Vec<_>>();
             assert_eq!(computer.ram, expected_ram);

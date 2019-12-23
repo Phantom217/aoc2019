@@ -61,20 +61,20 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_day01_part_one() {
+    fn test_day01() {
         let test_cases = &[
             // (input1, expected1, expected2)
-            ("12", 2, 2),
-            ("14", 2, 2),
-            ("1969", 654, 966),
-            ("100756", 33583, 50346),
+            ("12", "2", "2"),
+            ("14", "2", "2"),
+            ("1969", "654", "966"),
+            ("100756", "33583", "50346"),
         ];
 
         for (input, expected1, expected2) in test_cases {
             let reader = std::io::BufReader::new(input.as_bytes());
             let (actual1, actual2) = run(reader).unwrap();
-            assert_eq!(*expected1.to_string(), actual1);
-            assert_eq!(*expected2.to_string(), actual2);
+            assert_eq!(*expected1, actual1);
+            assert_eq!(*expected2, actual2);
         }
     }
 }

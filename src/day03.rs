@@ -12,7 +12,5 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_day03() {
-        unimplemented!()
-    }
+    fn test_day03() {}
 }

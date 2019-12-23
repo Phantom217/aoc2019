@@ -9,3 +9,10 @@ publish = false
 
 [dependencies]
 structopt = "0.3"
+
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "benchmarks"
+harness = false
