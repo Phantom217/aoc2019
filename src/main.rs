@@ -36,21 +36,23 @@ fn run() -> Result<(), Error> {
         Some(path) => {
             let file = fs::File::open(path).unwrap();
             let reader = io::BufReader::new(file);
-            Reader::File( reader )
-        },
+            Reader::File(reader)
+        }
         None => {
             let guard = stdin.lock();
             Reader::Stdin(guard)
-        },
+        }
     };
 
-    match opt.day {
+    let (answer1, answer2) = match opt.day {
         1 => aoc2019::day01::run(input)?,
         2 => aoc2019::day02::run(input)?,
         3 => aoc2019::day03::run(input)?,
         n if n > 1 && n < 26 => bail!("Day {} is not yet implemented", n),
         _ => bail!("Day must be between 1 and 25, inclusive."),
     };
+
+    println!("{}\n{}", answer1, answer2);
 
     Ok(())
 }

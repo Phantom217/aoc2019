@@ -54,29 +54,25 @@ impl Computer {
     }
 }
 
-pub fn run<R>(input: R) -> Result<(), Error>
+pub fn run<R>(input: R) -> Result<(String, String), Error>
 where
     R: std::io::BufRead,
 {
     let mut computer = Computer::new(input)?;
-    let answer = computer.execute(12, 2)?;
+    let answer1 = computer.execute(12, 2)?;
 
-    println!("{}", answer);
-
-    let mut answer = Err(error!(
+    let mut answer2 = Err(error!(
         "Invalid input. Unable to find noun/verb combination that outputs 19690720."
     ));
     for noun in 0..=99 {
         for verb in 0..=99 {
             if computer.execute(noun, verb)? == 19690720 {
-                answer = Ok(100 * noun + verb);
+                answer2 = Ok(100 * noun + verb);
             }
         }
     }
 
-    println!("{}", answer?);
-
-    Ok(())
+    Ok((format!("{}", answer1), format!("{}", answer2?)))
 }
 
 #[cfg(test)]
