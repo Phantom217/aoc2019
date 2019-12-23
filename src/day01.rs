@@ -1,32 +1,36 @@
 use crate::error::Error;
 
-pub fn run<R>(mut input: R) -> Result<(), Error>
+pub fn run<R>(input: R) -> Result<(), Error>
 where
     R: std::io::BufRead,
 {
-    let mut content = Vec::new();
-    input.read_to_end(&mut content)?;
+    let (ans1, ans2) = run2(input)?;
 
-
-    // Part 1
-    let mut reader = std::io::BufReader::new(&content[..]);
-    run_part(&mut reader, part_one)?;
-
-    // Part 2
-    let mut reader = std::io::BufReader::new(&content[..]);
-    run_part(&mut reader, part_two)?;
+    println!("{}\n{}", ans1, ans2);
 
     Ok(())
 }
 
-pub fn run_part<F, R>(input: &mut R, func: F) -> Result<(), Error>
+pub fn run2<R>(mut input: R) -> Result<(usize, usize), Error>
 where
-    F: Fn(usize) -> usize,
     R: std::io::BufRead,
 {
     let mut buffer = String::new();
 
-    let mut total = 0;
+    let mut total1 = 0;
+    let mut total2 = 0;
+
+    // // does the same as the loop but this has more resource allocations.
+    // // a new string is allocated every time we run through this for loop,
+    // // whereas in the loop we allocate one string up front and clear it at
+    // // the end of each loop and keep reusing it.
+    // for res in input.lines() {
+    //     let line = res?;
+    //     let num = line.parse::<usize>()?;
+    //
+    //     total1 += part_one(num);
+    //     total2 += part_two(num);
+    // }
 
     loop {
         if input.read_line(&mut buffer)? == 0 {
@@ -35,15 +39,13 @@ where
 
         let num = buffer.trim().parse::<usize>()?;
 
-        let fuel = func(num);
-        total += fuel;
+        total1 += part_one(num);
+        total2 += part_two(num);
 
         buffer.clear();
     }
 
-    println!("{}", total);
-
-    Ok(())
+    Ok((total1, total2))
 }
 
 fn part_one(num: usize) -> usize {
@@ -62,5 +64,28 @@ fn part_two(mut num: usize) -> usize {
         };
         total += m;
         num = m;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_day01_part_one() {
+        let test_cases = &[
+            // (input1, expected1, expected2)
+            ("12", 2, 2),
+            ("14", 2, 2),
+            ("1969", 654, 966),
+            ("100756", 33583, 50346),
+        ];
+
+        for (input, expected1, expected2) in test_cases {
+            let reader = std::io::BufReader::new(input.as_bytes());
+            let (actual1, actual2) = run2(reader).unwrap();
+            assert_eq!(*expected1, actual1);
+            assert_eq!(*expected2, actual2);
+        }
     }
 }
