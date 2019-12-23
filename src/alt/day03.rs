@@ -6,8 +6,9 @@ use crate::error::Error;
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 struct Point(i32, i32);
 
-type State = HashMap<Point, [bool; 2]>;
+type State = HashMap<Point, [Option<u32>; 2]>;
 
+// #[derive(Copy, Clone, Debug)]
 enum Direction {
     Up,
     Down,
@@ -31,6 +32,7 @@ impl TryFrom<char> for Direction {
     }
 }
 
+// #[derive(Copy, Clone, Debug)]
 struct Instruction {
     dir: Direction,
     dist: u32,
@@ -51,8 +53,9 @@ impl std::str::FromStr for Instruction {
 
 fn process_instruction(
     id: usize,
+    steps: u32,
     origin: Point,
-    instruction: Instruction,
+    instruction: &Instruction,
     state: &mut State,
 ) -> Point {
     let (i, j) = match instruction.dir {
@@ -65,8 +68,12 @@ fn process_instruction(
     let mut destination = origin;
     for n in 1..=instruction.dist {
         let point = Point(origin.0 + i * n as i32, origin.1 + j * n as i32);
-        let value = state.entry(point).or_insert_with(|| [false, false]);
-        value[id] = true;
+        let value = state.entry(point).or_insert_with(|| [None, None]);
+
+        if value[id].is_none() {
+            value[id] = Some(steps + n);
+        }
+
         destination = point;
     }
 
@@ -93,29 +100,39 @@ where
         let line = res?;
 
         let mut point = ORIGIN;
+        let mut steps = 0;
 
         for s in line.trim().split(',').map(|s| s.trim()) {
             let instruction = s.parse::<Instruction>()?;
-            let new_point = process_instruction(id, point, instruction, &mut state);
+            let new_point = process_instruction(id, steps, point, &instruction, &mut state);
+            steps += instruction.dist;
             point = new_point;
         }
 
         id += 1;
     }
 
-    let answer =
-        state
-            .iter()
-            .filter(|(_, v)| v[0] && v[1])
-            .fold(std::u32::MAX, |mut min, (point, _)| {
+    let (answer1, answer2) = state
+        .iter()
+        .filter(|(_, v)| v[0].is_some() && v[1].is_some())
+        .fold(
+            (std::u32::MAX, std::u32::MAX),
+            |(mut min_dist, mut min_steps), (point, array)| {
                 let dist = manhattan_distance(*point, ORIGIN);
-                if dist < min {
-                    min = dist
+                if dist < min_dist {
+                    min_dist = dist
                 }
-                min
-            });
 
-    Ok((format!("{}", answer), "foo".to_string()))
+                let steps = array[0].unwrap() + array[1].unwrap();
+                if steps < min_steps {
+                    min_steps = steps;
+                }
+
+                (min_dist, min_steps)
+            },
+        );
+
+    Ok((format!("{}", answer1), format!("{}", answer2)))
 }
 
 #[cfg(test)]
@@ -126,6 +143,7 @@ mod tests {
     fn test_day03() {
         let test_cases = &[
             // (input, expected1, expected2)
+            ("R8,U5,L5,D3\nU7,R6,D4,L4", "6", "30"),
             (
                 "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83",
                 "159",
@@ -138,10 +156,11 @@ mod tests {
             ),
         ];
 
-        for (input, expected1, _) in test_cases {
+        for (input, expected1, expected2) in test_cases {
             let reader = std::io::BufReader::new(input.as_bytes());
-            let (actual1, _) = run(reader).unwrap();
+            let (actual1, actual2) = run(reader).unwrap();
             assert_eq!(&actual1, expected1);
+            assert_eq!(&actual2, expected2);
         }
     }
 }
