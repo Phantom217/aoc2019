@@ -1,7 +1,5 @@
-use std::io;
-
-pub fn run<R>(mut input: R) -> usize
-    where R: io::BufRead {
+pub fn run<R>(mut input: R)
+    where R: std::io::BufRead {
     let mut buffer = String::new();
 
     let mut total = 0;
@@ -22,5 +20,5 @@ pub fn run<R>(mut input: R) -> usize
         buffer.clear();
     }
 
-    total
+    println!("{}", total);
 }
