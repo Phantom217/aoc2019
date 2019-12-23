@@ -1,7 +1,28 @@
+#[macro_use]
+mod macros;
+
 pub mod day01;
 pub mod day02;
 
 pub use self::reader::Reader;
+pub use self::error::Error;
+
+mod error {
+    #[derive(Debug)]
+    pub enum Error {
+        Custom(String),
+    }
+
+    impl std::fmt::Display for Error {
+        fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            match self {
+                Self::Custom(s) => write!(f, "{}", s),
+            }
+        }
+    }
+
+    impl std::error::Error for Error {}
+}
 
 mod reader {
 
