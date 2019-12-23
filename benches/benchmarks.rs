@@ -5,7 +5,7 @@ use aoc2019;
 use criterion::{criterion_group, criterion_main, Criterion};
 
 fn target_01(c: &mut Criterion) {
-    let day01 = fs::read_to_string("input/01.txt").unwrap();
+    let day01 = fs::read_to_string("input/day01.txt").unwrap();
     c.bench_function("day_01", move |b| {
         b.iter(|| {
             let reader = io::BufReader::new(day01.as_bytes());
@@ -15,7 +15,7 @@ fn target_01(c: &mut Criterion) {
 }
 
 fn target_02(c: &mut Criterion) {
-    let day02 = fs::read_to_string("input/02.txt").unwrap();
+    let day02 = fs::read_to_string("input/day02.txt").unwrap();
     c.bench_function("day_02", move |b| {
         b.iter(|| {
             let reader = io::BufReader::new(day02.as_bytes());
@@ -25,7 +25,7 @@ fn target_02(c: &mut Criterion) {
 }
 
 fn target_03(c: &mut Criterion) {
-    let day03 = fs::read_to_string("input/03.txt").unwrap();
+    let day03 = fs::read_to_string("input/day03.txt").unwrap();
     c.bench_function("day_03", move |b| {
         b.iter(|| {
             let reader = io::BufReader::new(day03.as_bytes());
