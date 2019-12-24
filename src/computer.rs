@@ -320,7 +320,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_day02() {
+    fn test_computer() {
         let test_cases = &[
             // (input, noun, verb, expected_ram)
             (

@@ -145,5 +145,6 @@ mod tests {
             assert_eq!(actual1, *expected1);
             assert_eq!(actual2, *expected2);
         }
+        crate::utils::tests::test_full_problem(4, run, "1169", "757");
     }
 }

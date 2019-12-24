@@ -162,5 +162,7 @@ mod tests {
             assert_eq!(&actual1, expected1);
             assert_eq!(&actual2, expected2);
         }
+
+        crate::utils::tests::test_full_problem(3, run, "4981", "164012");
     }
 }

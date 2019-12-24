@@ -1,5 +1,5 @@
-use crate::error::Error;
 use crate::computer::Computer;
+use crate::error::Error;
 
 pub fn run<R>(input: R) -> Result<(String, String), Error>
 where
@@ -13,11 +13,20 @@ where
     ));
     for noun in 0..=99 {
         for verb in 0..=99 {
-            if computer.execute(None, Some(( noun, verb )))? == 19_690_720 {
+            if computer.execute(None, Some((noun, verb)))? == 19_690_720 {
                 answer2 = Ok(100 * noun + verb);
             }
         }
     }
 
     Ok((answer1.to_string(), answer2?.to_string()))
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_day02() {
+        crate::utils::tests::test_full_problem(2, run, "3654868", "7014");
+    }
 }
