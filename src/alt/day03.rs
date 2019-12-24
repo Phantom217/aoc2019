@@ -132,7 +132,7 @@ where
             },
         );
 
-    Ok((format!("{}", answer1), format!("{}", answer2)))
+    Ok((answer1.to_string(), answer2.to_string()))
 }
 
 #[cfg(test)]
