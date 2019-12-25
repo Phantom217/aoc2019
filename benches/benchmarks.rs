@@ -78,6 +78,7 @@ criterion_group! {
     name = group;
     config = Criterion::default().warm_up_time(std::time::Duration::from_secs(5));
     targets = target_01, target_02, target_03, target_04, target_05, target_06, target_07,
+// target_08, target_09,
 }
 
 criterion_main!(group);
