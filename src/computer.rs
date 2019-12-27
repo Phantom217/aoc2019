@@ -97,8 +97,20 @@ pub(crate) struct Computer {
     rb: i64,
 }
 
+impl Default for Computer {
+    fn default() -> Self {
+        Self {
+            ram: Vec::new(),
+            input: Channel::default(),
+            output: Channel::default(),
+            pc: 0,
+            rb: 0,
+        }
+    }
+}
+
 impl Computer {
-    pub(crate) fn new(input: Channel<i64>, output: Channel<i64>) -> Self {
+    pub(crate) fn with_io(input: Channel<i64>, output: Channel<i64>) -> Self {
         Self {
             ram: Vec::new(),
             input,
@@ -426,7 +438,7 @@ mod tests {
         for (input, noun, verb, expected_ram) in test_cases {
             let reader = std::io::BufReader::new(input.as_bytes());
             let rom = Rom::from_reader(reader).unwrap();
-            let mut computer = Computer::new(Channel::default(), Channel::default());
+            let mut computer = Computer::default();
             let _ = computer.execute(&rom, Some((*noun, *verb))).unwrap();
             let expected_ram = expected_ram
                 .split(',')
