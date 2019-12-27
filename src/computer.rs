@@ -63,17 +63,16 @@ impl<T> Channel<T> {
     }
 
     pub(crate) fn pop_front(&mut self) -> Result<T, Error> {
-        use crossbeam::channel::RecvTimeoutError;
         match self
             .receiver
             .recv_timeout(std::time::Duration::from_secs(5))
         {
             Ok(val) => Ok(val),
             Err(e) => match e {
-                RecvTimeoutError::Timeout => {
+                crossbeam::channel::RecvTimeoutError::Timeout => {
                     bail!("Attempted to pop value off channel, but timed out.")
                 }
-                RecvTimeoutError::Disconnected => unreachable!(),
+                crossbeam::channel::RecvTimeoutError::Disconnected => unreachable!(),
             },
         }
     }
