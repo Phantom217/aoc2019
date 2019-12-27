@@ -17,16 +17,16 @@ where
     let answer1 = match buf
         .chunks(ROWS * COLS)
         .fold((std::usize::MAX, None), |mut state, layer| {
-            let nzeros = layer.iter().filter(|b| **b == 0).count();
-            if nzeros < state.0 {
-                state = (nzeros, Some(layer));
+            let num_zeros = bytecount::count(layer, 0);
+            if num_zeros < state.0 {
+                state = (num_zeros, Some(layer));
             }
             state
         }) {
         (_, Some(layer)) => {
-            let nones = layer.iter().filter(|b| **b == 1).count();
-            let ntwos = layer.iter().filter(|b| **b == 2).count();
-            nones * ntwos
+            let num_ones = bytecount::count(layer, 1);
+            let num_twos = bytecount::count(layer, 2);
+            num_ones * num_twos
         }
         (_, None) => bail!("TODO"),
     };

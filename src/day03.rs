@@ -43,6 +43,7 @@ struct Instruction {
 impl Add<Instruction> for Point {
     type Output = Point;
 
+    #[allow(clippy::suspicious_arithmetic_impl)]
     fn add(self, rhs: Instruction) -> Self::Output {
         match rhs.dir {
             Direction::Up => Point {

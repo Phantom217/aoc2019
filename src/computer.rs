@@ -119,7 +119,7 @@ impl Computer {
         // reset state
         self.rb = 0;
         self.pc = 0;
-        self.ram = rom.as_ref().iter().cloned().collect();
+        self.ram = rom.as_ref().to_vec();
 
         // set inputs
         if let Some((noun, verb)) = noun_and_verb {
@@ -277,7 +277,7 @@ impl Iterator for Modes {
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.0 {
-            0 => return Some(Ok(Mode::Position)),
+            0 => Some(Ok(Mode::Position)),
             _ => {
                 let mode = match Mode::try_from(self.0 % 10) {
                     Ok(mode) => mode,

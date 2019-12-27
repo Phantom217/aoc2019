@@ -103,8 +103,10 @@ where
 
         let (mut answer1, mut answer2) = (0, 0);
 
-        let mut iter = rx_output.iter();
-        while let Some((part, output)) = iter.next() {
+        let iter = rx_output.iter();
+        for (part, output) in iter {
+
+        // while let Some((part, output)) = iter.next() {
             match part {
                 0 => {
                     if output > answer1 {

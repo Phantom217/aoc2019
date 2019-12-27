@@ -155,16 +155,16 @@ where
 
         directed
             .entry(id_parent)
-            .or_insert_with(|| Vec::new())
+            .or_insert_with(Vec::new)
             .push(id_child);
 
         undirected
             .entry(id_parent)
-            .or_insert_with(|| Vec::new())
+            .or_insert_with(Vec::new)
             .push(id_child);
         undirected
             .entry(id_child)
-            .or_insert_with(|| Vec::new())
+            .or_insert_with(Vec::new)
             .push(id_parent);
 
         buffer.clear();
