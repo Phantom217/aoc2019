@@ -34,18 +34,20 @@ impl std::hash::Hash for F64 {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
-pub(crate) struct Point(i64, i64);
+pub(crate) struct Vec2<T>(T, T);
 
-impl Point {
-    pub(crate) fn new(x: i64, y: i64) -> Self {
+impl<T> Vec2<T> {
+    pub(crate) const fn new(x: T, y: T) -> Self {
         Self(x, y)
     }
+}
 
-    pub(crate) fn x(&self) -> i64 {
+impl<T> Vec2<T> where T: Copy {
+    pub(crate) fn x(&self) -> T {
         self.0
     }
 
-    pub(crate) fn y(&self) -> i64 {
+    pub(crate) fn y(&self) -> T {
         self.1
     }
 }

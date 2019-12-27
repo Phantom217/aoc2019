@@ -3,7 +3,9 @@ use std::collections::{HashMap, HashSet, VecDeque};
 use std::convert::TryFrom;
 
 use crate::error::Error;
-use crate::utils::{Point, F64};
+use crate::utils::{Vec2, F64};
+
+type Point = Vec2<i64>;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 struct Asteroid {
