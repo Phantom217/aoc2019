@@ -28,7 +28,7 @@ where
             let num_twos = bytecount::count(layer, 2);
             num_ones * num_twos
         }
-        (_, None) => bail!("TODO"),
+        (_, None) => bail!("Error"),
     };
 
     // Part 2

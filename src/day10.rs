@@ -139,7 +139,7 @@ fn part1(points: &[Point]) -> Result<(usize, Point), Error> {
         state
     });
 
-    let point = *point.ok_or_else(|| error!("TODO"))?;
+    let point = *point.ok_or_else(|| error!("Could not find 200th asteroid."))?;
 
     Ok((max, point))
 }

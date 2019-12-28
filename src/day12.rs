@@ -37,7 +37,9 @@ fn parse_input<R>(reader: R) -> Result<Moons, Error>
 where
     R: std::io::BufRead,
 {
-    // safety: TODO
+    // safety: This is safe because the code below ensures that by the time we
+    // would ever try to touch the moons array, all values inside will contain
+    // specific values that we have written to it.
     let mut moons: [RefCell<Moon>; 4] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
     let mut count = 0;
     for res in reader.lines() {
@@ -55,7 +57,7 @@ where
             let coord = dim
                 .split('=')
                 .nth(1)
-                .ok_or_else(|| error!("TODO"))?
+                .ok_or_else(|| error!("Failed to parse line into a Moon: {:?}", line))?
                 .chars()
                 .take_while(|&c| c != '>')
                 .collect::<String>()
