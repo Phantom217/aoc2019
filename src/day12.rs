@@ -16,6 +16,8 @@ use self::normal::Moon;
 ))]
 use self::simd::Moon;
 
+const PAIRS: [(usize, usize); 6] = [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)];
+
 pub fn run<R>(reader: R) -> Result<(String, String), Error>
 where
     R: std::io::BufRead,
@@ -126,22 +128,21 @@ mod normal {
 
     impl Moons {
         pub(crate) fn step(&mut self) {
-            for moon_i in &self.0 {
-                for moon_j in &self.0 {
-                    if moon_i == moon_j {
-                        continue;
-                    }
+            for (i, j) in PAIRS.iter() {
+                let moon_i = self.0.get(*i).unwrap();
+                let moon_j = self.0.get(*j).unwrap();
 
-                    for k in 0..3 {
-                        let pos_i = moon_i.borrow().pos()[k];
-                        let pos_j = moon_j.borrow().pos()[k];
+                for k in 0..3 {
+                    let pos_i = moon_i.borrow().pos()[k];
+                    let pos_j = moon_j.borrow().pos()[k];
 
-                        if pos_i < pos_j {
-                            moon_i.borrow_mut().vel_mut()[k] += 1;
-                        } else if pos_i > pos_j {
-                            moon_i.borrow_mut().vel_mut()[k] -= 1;
-                        } else {
-                        }
+                    if pos_i < pos_j {
+                        moon_i.borrow_mut().vel_mut()[k] += 1;
+                        moon_j.borrow_mut().vel_mut()[k] -= 1;
+                    } else if pos_i > pos_j {
+                        moon_i.borrow_mut().vel_mut()[k] -= 1;
+                        moon_j.borrow_mut().vel_mut()[k] += 1;
+                    } else {
                     }
                 }
             }
@@ -211,33 +212,30 @@ mod simd {
     }
     impl Moons {
         pub(crate) fn step(&mut self) {
-            for moon_i in &self.0 {
-                for moon_j in &self.0 {
-                    if moon_i == moon_j {
-                        continue;
-                    }
+            for (i, j) in PAIRS.iter() {
+                let moon_i = self.0.get(*i).unwrap();
+                let moon_j = self.0.get(*j).unwrap();
 
-                    let pos_i = moon_i.borrow().pos;
-                    let pos_j = moon_j.borrow().pos;
+                let pos_i = moon_i.borrow().pos;
+                let pos_j = moon_j.borrow().pos;
 
-                    // Adding
-                    let mask_gt = unsafe { _mm256_cmpgt_epi64(pos_i, pos_j) };
-                    let operand_add = unsafe { _mm256_and_si256(mask_gt, *NEGATIVE_ONE) };
+                // Adding
+                let mask_gt = unsafe { _mm256_cmpgt_epi64(pos_i, pos_j) };
+                let operand_add = unsafe { _mm256_and_si256(mask_gt, *NEGATIVE_ONE) };
 
-                    // Subtracting
-                    let mask_lt = unsafe { _mm256_cmpgt_epi64(pos_j, pos_i) };
-                    let operand_sub = unsafe { _mm256_and_si256(mask_lt, *ONE) };
+                // Subtracting
+                let mask_lt = unsafe { _mm256_cmpgt_epi64(pos_j, pos_i) };
+                let operand_sub = unsafe { _mm256_and_si256(mask_lt, *ONE) };
 
-                    let operand = unsafe { _mm256_or_si256(operand_add, operand_sub) };
+                let operand = unsafe { _mm256_or_si256(operand_add, operand_sub) };
 
-                    let mut moon_ref = moon_i.borrow_mut();
-                    let vel_ref = moon_ref.vel_mut();
-                    *vel_ref = unsafe { _mm256_add_epi64(*vel_ref, operand) };
+                let mut moon_ref = moon_i.borrow_mut();
+                let vel_ref = moon_ref.vel_mut();
+                *vel_ref = unsafe { _mm256_add_epi64(*vel_ref, operand) };
 
-                    // let mut moon_ref = moon_j.borrow_mut();
-                    // let vel_ref = moon_ref.vel_mut();
-                    // *vel_ref = unsafe { _mm256_sub_epi64(*vel_ref, operand_add) };
-                }
+                let mut moon_ref = moon_j.borrow_mut();
+                let vel_ref = moon_ref.vel_mut();
+                *vel_ref = unsafe { _mm256_sub_epi64(*vel_ref, operand) };
             }
 
             for moon in self.iter_mut() {
@@ -329,7 +327,7 @@ mod tests {
             ),
         ];
 
-        for (input, steps, expected1, expected2) in test_cases_part_one {
+        for (input, steps, expected1, _) in test_cases_part_one {
             let reader = std::io::BufReader::new(input.as_bytes());
 
             let mut moons = parse_input(reader).unwrap();
