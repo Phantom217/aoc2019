@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -ex
+
+CARGO_TARGET_DIR="target/normal" \
+    RUSTFLAGS="" \
+    "$@"
+
+has_avx2=$(lscpu | awk -F ":" 'END{print $2 ~ /avx2/}')
+if [ "$has_avx2" -eq "1" ]; then
+    CARGO_TARGET_DIR="target/simd" \
+        RUSTFLAGS="-C target-cpu=native" \
+        "$@"
+fi
+
+# vim: set et sw=4 sts=4 ft=sh
