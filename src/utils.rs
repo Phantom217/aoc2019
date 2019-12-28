@@ -71,6 +71,7 @@ impl<T> From<(T, T)> for Vec2<T> {
 pub(crate) struct Vec3<T>([T; 3]);
 
 impl<T> Vec3<T> {
+    #[allow(unused)]
     pub(crate) const fn new(x: T, y: T, z: T) -> Self {
         Self([x, y, z])
     }
@@ -103,14 +104,17 @@ impl<T> Vec3<T>
 where
     T: Copy,
 {
+    #[allow(unused)]
     pub(crate) fn x(&self) -> T {
         self.0[0]
     }
 
+    #[allow(unused)]
     pub(crate) fn y(&self) -> T {
         self.0[1]
     }
 
+    #[allow(unused)]
     pub(crate) fn z(&self) -> T {
         self.0[2]
     }
@@ -125,6 +129,28 @@ impl<T> From<(T, T, T)> for Vec3<T> {
 impl<T> From<[T; 3]> for Vec3<T> {
     fn from(array: [T; 3]) -> Self {
         Self(array)
+    }
+}
+
+#[cfg(all(
+    any(target_arch = "x86", target_arch = "x86_64"),
+    target_feature = "avx2"
+))]
+mod simd {
+    use super::*;
+
+    #[cfg(target_arch = "x86")]
+    use std::arch::x86::*;
+    #[cfg(target_arch = "x86_64")]
+    use std::arch::x86_64::*;
+
+    impl From<__m256i> for Vec3<i64> {
+        fn from(v: __m256i) -> Self {
+            let mut a: [i64; 4] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
+            #[allow(clippy::cast_ptr_alignment)]
+            unsafe { _mm256_storeu_si256(&mut a as *mut _ as *mut __m256i, v) };
+            Vec3::new(a[3], a[2], a[1])
+        }
     }
 }
 

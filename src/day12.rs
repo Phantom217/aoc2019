@@ -142,7 +142,6 @@ mod normal {
                     } else if pos_i > pos_j {
                         moon_i.borrow_mut().vel_mut()[k] -= 1;
                         moon_j.borrow_mut().vel_mut()[k] += 1;
-                    } else {
                     }
                 }
             }
@@ -282,9 +281,7 @@ mod simd {
         }
 
         pub(crate) fn pos(&self) -> Vec3<i64> {
-            let mut a: [i64; 4] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
-            unsafe { _mm256_storeu_si256(&mut a as *mut _ as *mut _, self.pos) };
-            Vec3::new(a[3], a[2], a[1])
+            self.pos.into()
         }
 
         pub(crate) fn pos_mut(&mut self) -> &mut __m256i {
@@ -292,9 +289,7 @@ mod simd {
         }
 
         pub(crate) fn vel(&self) -> Vec3<i64> {
-            let mut a: [i64; 4] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
-            unsafe { _mm256_storeu_si256(&mut a as *mut _ as *mut _, self.vel) };
-            Vec3::new(a[3], a[2], a[1])
+            self.vel.into()
         }
 
         pub(crate) fn vel_mut(&mut self) -> &mut __m256i {

@@ -52,9 +52,7 @@ where
             let tx_output = tx_output.clone();
 
             let handle = s.spawn(move |_| {
-                while let Ok(data) = rx_input.recv() {
-                    let (part, phase_setting, input, output) = data;
-
+                while let Ok((part, phase_setting, input, output)) = rx_input.recv() {
                     let mut computer = Computer::with_io(input, output);
 
                     computer.input_mut().push_back(phase_setting);
@@ -104,7 +102,6 @@ where
 
         let iter = rx_output.iter();
         for (part, output) in iter {
-            // while let Some((part, output)) = iter.next() {
             match part {
                 0 => {
                     if output > answer1 {
