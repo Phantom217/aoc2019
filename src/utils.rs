@@ -67,6 +67,67 @@ impl<T> From<(T, T)> for Vec2<T> {
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+pub(crate) struct Vec3<T>([T; 3]);
+
+impl<T> Vec3<T> {
+    pub(crate) const fn new(x: T, y: T, z: T) -> Self {
+        Self([x, y, z])
+    }
+}
+
+impl<T> Default for Vec3<T>
+where
+    T: Copy + Default,
+{
+    fn default() -> Self {
+        Self([T::default(); 3])
+    }
+}
+
+impl<T> std::ops::Deref for Vec3<T> {
+    type Target = [T];
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<T> std::ops::DerefMut for Vec3<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl<T> Vec3<T>
+where
+    T: Copy,
+{
+    pub(crate) fn x(&self) -> T {
+        self.0[0]
+    }
+
+    pub(crate) fn y(&self) -> T {
+        self.0[1]
+    }
+
+    pub(crate) fn z(&self) -> T {
+        self.0[2]
+    }
+}
+
+impl<T> From<(T, T, T)> for Vec3<T> {
+    fn from(tup: (T, T, T)) -> Self {
+        Self([tup.0, tup.1, tup.2])
+    }
+}
+
+impl<T> From<[T; 3]> for Vec3<T> {
+    fn from(array: [T; 3]) -> Self {
+        Self(array)
+    }
+}
+
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::error::Error;

@@ -94,10 +94,41 @@ fn target_09(c: &mut Criterion) {
     });
 }
 
+fn target_10(c: &mut Criterion) {
+    let day10 = fs::read_to_string("input/day10.txt").unwrap();
+    c.bench_function("day_10", move |b| {
+        b.iter(|| {
+            let reader = io::BufReader::new(day10.as_bytes());
+            aoc2019::day10::run(reader).unwrap();
+        })
+    });
+}
+
+fn target_11(c: &mut Criterion) {
+    let day11 = fs::read_to_string("input/day11.txt").unwrap();
+    c.bench_function("day_11", move |b| {
+        b.iter(|| {
+            let reader = io::BufReader::new(day11.as_bytes());
+            aoc2019::day11::run(reader).unwrap();
+        })
+    });
+}
+
+fn target_12(c: &mut Criterion) {
+    let day12 = fs::read_to_string("input/day12.txt").unwrap();
+    c.bench_function("day_12", move |b| {
+        b.iter(|| {
+            let reader = io::BufReader::new(day12.as_bytes());
+            aoc2019::day12::run(reader).unwrap();
+        })
+    });
+}
+
 criterion_group! {
     name = group;
     config = Criterion::default().warm_up_time(std::time::Duration::from_secs(5));
-    targets = target_01, target_02, target_03, target_04, target_05, target_06, target_07, target_08, target_09,
+    targets = target_01, target_02, target_03, target_04, target_05, target_06,
+        target_07, target_08, target_09, target_10, target_11, target_12,
 }
 
 criterion_main!(group);
