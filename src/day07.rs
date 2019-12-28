@@ -52,11 +52,9 @@ where
             let tx_output = tx_output.clone();
 
             let handle = s.spawn(move |_| {
-                loop {
-                    let (part, phase_setting, input, output) = match rx_input.recv() {
-                        Ok(data) => data,
-                        Err(_) => break,
-                    };
+                while let Ok(data) = rx_input.recv() {
+                    let (part, phase_setting, input, output) = data;
+
                     let mut computer = Computer::with_io(input, output);
 
                     computer.input_mut().push_back(phase_setting);
@@ -73,6 +71,7 @@ where
                         tx_output.send((part, answer)).unwrap();
                     }
                 }
+
                 Ok::<_, Error>(())
             });
             handles.push(handle);

@@ -126,7 +126,7 @@ fn part1(points: &[Point]) -> Result<(usize, Point), Error> {
         for other in points {
             let direction = Direction::new(*origin, *other)?;
             map.entry(*origin)
-                .or_insert_with(|| HashSet::new())
+                .or_insert_with(HashSet::new)
                 .insert(direction);
         }
     }

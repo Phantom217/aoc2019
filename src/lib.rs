@@ -12,10 +12,11 @@ pub mod day07;
 pub mod day08;
 pub mod day09;
 pub mod day10;
+pub mod day11;
 mod utils;
 
-pub use self::reader::Reader;
 pub use self::error::Error;
+pub use self::reader::Reader;
 
 mod error {
     #[derive(Debug)]
@@ -54,7 +55,7 @@ mod reader {
 
     pub enum Reader<'a> {
         File(std::io::BufReader<std::fs::File>),
-        Stdin(std::io::StdinLock<'a>)
+        Stdin(std::io::StdinLock<'a>),
     }
 
     impl<'a> std::io::Read for Reader<'a> {

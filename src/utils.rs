@@ -1,6 +1,6 @@
 use crate::error::Error;
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug)]
 pub(crate) struct F64(f64);
 
 impl std::convert::TryFrom<f64> for F64 {
@@ -19,6 +19,12 @@ impl std::ops::Deref for F64 {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl PartialEq for F64 {
+    fn eq(&self, other: &F64) -> bool {
+        self.0 == other.0
     }
 }
 
@@ -42,13 +48,22 @@ impl<T> Vec2<T> {
     }
 }
 
-impl<T> Vec2<T> where T: Copy {
+impl<T> Vec2<T>
+where
+    T: Copy,
+{
     pub(crate) fn x(&self) -> T {
         self.0
     }
 
     pub(crate) fn y(&self) -> T {
         self.1
+    }
+}
+
+impl<T> From<(T, T)> for Vec2<T> {
+    fn from(tup: (T, T)) -> Self {
+        Self(tup.0, tup.1)
     }
 }
 

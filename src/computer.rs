@@ -58,6 +58,10 @@ impl<T> Default for Channel<T> {
 }
 
 impl<T> Channel<T> {
+    pub(crate) fn into_parts(self) -> (Sender<T>, Receiver<T>) {
+        (self.sender, self.receiver)
+    }
+
     pub(crate) fn push_back(&mut self, val: T) {
         self.sender.send(val).unwrap()
     }
