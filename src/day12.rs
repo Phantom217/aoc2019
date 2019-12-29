@@ -1,8 +1,9 @@
 use std::cell::RefCell;
+use std::collections::HashSet;
 use std::ops::{Deref, DerefMut};
 
 use crate::error::Error;
-use crate::utils::Vec3;
+use crate::utils::{math::lcm, Vec3};
 
 #[cfg(not(all(
     any(target_arch = "x86", target_arch = "x86_64"),
@@ -24,13 +25,41 @@ where
 {
     let mut moons = parse_input(reader)?;
 
-    for _ in 0..1000 {
-        moons.step()
+    let mut num_steps = 0;
+    let mut answer1 = Err(error!("Did not complete 1_000 steps."));
+
+    let mut seen = [HashSet::new(), HashSet::new(), HashSet::new()];
+    let mut counts = [None, None, None];
+
+    loop {
+        let state = moons.state();
+
+        for coord in 0..3 {
+            if counts[coord].is_none() && !seen[coord].insert(state[coord]) {
+                counts[coord] = Some(num_steps)
+            }
+        }
+
+        let finished = counts.iter().all(|count| count.is_some());
+
+        if finished {
+            break;
+        }
+
+        moons.step();
+        num_steps += 1;
+
+        if num_steps == 1_000 {
+            answer1 = Ok(moons.energy());
+        }
     }
 
-    let answer1 = moons.energy();
+    let answer2 = lcm(
+        lcm(counts[0].unwrap(), counts[1].unwrap())?,
+        counts[2].unwrap(),
+    )?;
 
-    Ok((answer1.to_string(), String::new()))
+    Ok((answer1?.to_string(), answer2.to_string()))
 }
 
 fn parse_input<R>(reader: R) -> Result<Moons, Error>
@@ -104,6 +133,21 @@ impl Moons {
         }
 
         total
+    }
+
+    pub(crate) fn state(&self) -> [[(i64, i64); 4]; 3] {
+        // safety: code below ensures we're filling uninitialized array with actual values
+        let mut a: [[(i64, i64); 4]; 3] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
+
+        for moon in 0..4 {
+            let state = self.0[moon].borrow().state();
+
+            for coord in 0..3 {
+                a[coord][moon] = state[coord];
+            }
+        }
+
+        a
     }
 }
 
@@ -189,6 +233,14 @@ mod normal {
 
         pub(crate) fn vel_mut(&mut self) -> &mut Vec3<i64> {
             &mut self.vel
+        }
+
+        pub(crate) fn state(&self) -> [(i64, i64); 3] {
+            [
+                (self.pos.x(), self.vel.x()),
+                (self.pos.y(), self.vel.y()),
+                (self.pos.z(), self.vel.z()),
+            ]
         }
     }
 }
@@ -297,6 +349,12 @@ mod simd {
         pub(crate) fn vel_mut(&mut self) -> &mut __m256i {
             &mut self.vel
         }
+
+        pub(crate) fn state(&self) -> [(i64, i64); 3] {
+            let pos: Vec3<i64> = self.pos.into();
+            let vel: Vec3<i64> = self.vel.into();
+            [(pos.x(), vel.x()), (pos.y(), vel.y()), (pos.z(), vel.z())]
+        }
     }
 }
 
@@ -308,7 +366,7 @@ mod tests {
 
     #[test]
     fn test_day12() {
-        let test_cases_part_one = &[
+        let test_cases = &[
             // input, steps, expected
             (
                 "<x=-1, y=0, z=2>\n<x=2, y=-10, z=-7>\n<x=4, y=-8, z=8>\n<x=3, y=5, z=-1>",
@@ -324,7 +382,7 @@ mod tests {
             ),
         ];
 
-        for (input, steps, expected1, _) in test_cases_part_one {
+        for (input, steps, expected1, _) in test_cases {
             let reader = std::io::BufReader::new(input.as_bytes());
 
             let mut moons = parse_input(reader).unwrap();
@@ -335,10 +393,11 @@ mod tests {
 
             let actual1 = moons.energy();
 
+
             assert_eq!(actual1, *expected1);
             // assert_eq!(actual2, *expected2);
         }
 
-        utils::tests::test_full_problem(12, run, "7928", "");
+        utils::tests::test_full_problem(12, run, "7928", "518311327635164");
     }
 }

@@ -1,5 +1,43 @@
 use crate::error::Error;
 
+pub(crate) mod math {
+    use super::*;
+
+    pub(crate) fn gcf(a: u64, b: u64) -> Result<u64, Error> {
+        if a == 0 || b == 0 {
+            bail!("gcf function only works with positive inputs.");
+        }
+
+        let (mut smaller, mut larger) = if a > b { (b, a) } else { (a, b) };
+
+        loop {
+            let remainder = larger % smaller;
+            if remainder == 0 {
+                return Ok(smaller);
+            }
+
+            larger = smaller;
+            smaller = remainder;
+        }
+    }
+    pub(crate) fn lcm(a: u64, b: u64) -> Result<u64, Error> {
+        Ok(a * b / gcf(a, b)?)
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn test_gcf() {
+            assert_eq!(5, gcf(5, 5).unwrap());
+            assert_eq!(5, gcf(5, 10).unwrap());
+            assert_eq!(3, gcf(15, 21).unwrap());
+            assert!(gcf(1, 0).is_err());
+        }
+    }
+}
+
 #[derive(Copy, Clone, Debug)]
 pub(crate) struct F64(f64);
 
@@ -148,7 +186,9 @@ mod simd {
         fn from(v: __m256i) -> Self {
             let mut a: [i64; 4] = unsafe { std::mem::MaybeUninit::uninit().assume_init() };
             #[allow(clippy::cast_ptr_alignment)]
-            unsafe { _mm256_storeu_si256(&mut a as *mut _ as *mut __m256i, v) };
+            unsafe {
+                _mm256_storeu_si256(&mut a as *mut _ as *mut __m256i, v)
+            };
             Vec3::new(a[3], a[2], a[1])
         }
     }
