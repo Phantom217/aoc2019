@@ -3,7 +3,24 @@ use crate::error::Error;
 pub(crate) mod math {
     use super::*;
 
-    pub(crate) fn gcf(a: u64, b: u64) -> Result<u64, Error> {
+    pub(crate) fn fact(mut n: usize) -> Result<usize, Error> {
+        let mut ans = 1usize;
+        loop {
+            ans = match ans.checked_mul(n) {
+                Some(val) => val,
+                None => bail!("Factorial of {} overflows usize.", n),
+            };
+            if n < 2 {
+                break;
+            } else {
+                n -= 1;
+            }
+        }
+
+        Ok(ans)
+    }
+
+    fn gcf(a: u64, b: u64) -> Result<u64, Error> {
         if a == 0 || b == 0 {
             bail!("gcf function only works with positive inputs.");
         }
@@ -34,6 +51,13 @@ pub(crate) mod math {
             assert_eq!(5, gcf(5, 10).unwrap());
             assert_eq!(3, gcf(15, 21).unwrap());
             assert!(gcf(1, 0).is_err());
+        }
+
+        #[test]
+        fn test_factorial() {
+            assert_eq!(fact(5).unwrap(), 120);
+            assert_eq!(fact(2).unwrap(), 2);
+            assert_eq!(fact(8).unwrap(), 40_320);
         }
     }
 }
