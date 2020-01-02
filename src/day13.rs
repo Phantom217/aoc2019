@@ -59,21 +59,21 @@ impl Game {
         }
     }
 
-    // pub fn run(&mut self) -> Result<(), Error> {
-    //     loop {
-    //         match self.step()? {
-    //             Some(next_move) => self.computer.input_mut().enqueue(next_move),
-    //             None => break,
-    //         }
-    //     }
-    //
-    //     Ok(())
-    // }
-
     pub fn run(&mut self) -> Result<(), Error> {
         loop {
+            match self.step()? {
+                Some(next_move) => self.computer.input_mut().enqueue(next_move),
+                None => break,
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn step(&mut self) -> Result<Option<i64>, Error> {
+        loop {
             match self.computer.step()? {
-                State::Done => return Ok(()),
+                State::Done => return Ok(None),
                 State::NeedsInput => {
                     if self.first {
                         self.num_blocks = bytecount::count(&self.display[..], 2);
@@ -81,11 +81,11 @@ impl Game {
                     }
 
                     if self.paddle < self.ball {
-                        self.computer.input_mut().enqueue(1);
+                        return Ok(Some(1))
                     } else if self.paddle > self.ball {
-                        self.computer.input_mut().enqueue(-1);
+                        return Ok(Some(-1))
                     } else {
-                        self.computer.input_mut().enqueue(0);
+                        return Ok(Some(0))
                     }
                 }
                 State::HasOutput => {
@@ -130,55 +130,6 @@ impl Game {
         }
     }
 
-    // pub fn step(&mut self) -> Result<(), Error> {
-    //     loop {
-    //         match self.computer.step()? {
-    //             State::Done => return Ok(()),
-    //             State::NeedsInput => Ok(()),
-    //             State::HasOutput => {
-    //                 if self.x.is_none() {
-    //                     self.x = Some(self.computer.output_mut().dequeue().unwrap());
-    //                     continue;
-    //                 }
-    //                 if self.y.is_none() {
-    //                     self.y = Some(self.computer.output_mut().dequeue().unwrap());
-    //                     continue;
-    //                 }
-    //                 if self.id.is_none() {
-    //                     self.id = Some(self.computer.output_mut().dequeue().unwrap());
-    //                     continue;
-    //                 }
-    //                 if self.x.is_some() && self.y.is_some() && self.id.is_some() {
-    //                     let x = self.x.unwrap();
-    //                     let y = self.y.unwrap();
-    //                     let id = self.id.unwrap();
-    //
-    //                     if x == -1 && y == 0 {
-    //                         self.score = id;
-    //                         continue;
-    //                     }
-    //
-    //                     if id > 4 || id < 0 {
-    //                         bail!("Received invalid id: {}", id);
-    //                     }
-    //
-    //                     // match id {
-    //                     //     0 | 1 | 2 => (),
-    //                     //     3 => self.paddle = x,
-    //                     //     4 => self.ball = x,
-    //                     //     _ => bail!("Received invalid id: {}", id),
-    //                     // }
-    //
-    //                     self.display[(y as usize) * COLS + x as usize] = id as u8;
-    //                     self.x = None;
-    //                     self.y = None;
-    //                     self.id = None;
-    //                 }
-    //             }
-    //         };
-    //     }
-    // }
-
     pub const fn rows(&self) -> usize {
         ROWS
     }
@@ -187,12 +138,16 @@ impl Game {
         COLS
     }
 
-    pub fn display(&self) -> *const u8 {
-        self.display.as_ptr()
+    pub fn display(&self) -> &[u8] {
+        &self.display
     }
 
-    pub fn display_len(&self) -> usize {
-        self.display.len()
+    pub fn input(&mut self, val: i64) {
+        self.computer.input_mut().enqueue(val)
+    }
+
+    pub fn score(&self) -> i64 {
+        self.score
     }
 }
 

@@ -1,7 +1,7 @@
 #[macro_use]
 mod macros;
 
-pub mod computer;
+mod computer;
 pub mod day01;
 pub mod day02;
 pub mod day03;
@@ -17,8 +17,10 @@ pub mod day12;
 pub mod day13;
 mod utils;
 
+pub use self::computer::Rom;
 pub use self::error::Error;
 pub use self::reader::Reader;
+pub use day13::Game;
 
 mod error {
     #[derive(Debug)]
